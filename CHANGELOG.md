@@ -2,6 +2,12 @@
 
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-11-07
+
+### Added
+
+- Hide the "Party" label while the own frame is hidden
+
 ## [0.1.0] - 2026-11-07
 
 ### Added
