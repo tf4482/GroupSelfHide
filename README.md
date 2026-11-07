@@ -9,6 +9,7 @@ WoW addon (WoW Forever) that hides **your own frame** in raid-style party frames
 - Mode `hide` (`/gsh hide`): only hide your frame, the gap stays
 - Calling a command while a mode is active switches back to normal
 - Choice persists across sessions (default: off)
+- Inactive in raids and with a vertical party layout
 - Applies out of combat only
 
 ## Screenshots
