@@ -1,6 +1,6 @@
 # GroupSelfHide
 
-WoW addon (WoW Forever / Retail API) that hides **your own frame** in raid-style party frames.
+WoW addon (WoW Forever) that hides **your own frame** in raid-style party frames.
 
 ## Features
 
@@ -9,6 +9,13 @@ WoW addon (WoW Forever / Retail API) that hides **your own frame** in raid-style
 - Mode `fill`: also widen the other frames to keep the group width (2-5 players)
 - Choice persists across sessions
 - Applies out of combat only
+
+## Screenshots
+
+Before (own frame shown) and after (`/gsh fill`):
+
+![Before](docs/before.png)
+![After](docs/after.png)
 
 ## Install
 
