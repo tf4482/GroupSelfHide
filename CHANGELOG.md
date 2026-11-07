@@ -2,6 +2,18 @@
 
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- `/gsh` is now the fill mode, `/gsh hide` the hide mode
+- Calling a command while a mode is active switches back to normal
+- Default is off
+
+### Removed
+
+- `/gsh fill` and `/gsh help`
+
 ## [0.3.1] - 2026-11-07
 
 ### Changed
