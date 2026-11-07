@@ -1,23 +1,41 @@
--- GroupSelfHide: hide the player's own compact raid/party frame
+-- GroupSelfHide: hide the player's own compact party frame
 
 local PREFIX = "|cff33ff99GroupSelfHide|r "
+local hiddenByUs = {} -- frames we hid, to undo later
+local titleHidden, resized, baseWidth, busy
 
--- Apply state to one compact frame (out of combat only, frames are protected)
+-- Mode is nil (off), "hide" or "fill"
+local function Active()
+  return GroupSelfHideDB and GroupSelfHideDB.mode ~= nil
+end
+
+-- Hide or restore one compact frame (out of combat only, frames are protected)
 local function Apply(frame)
   if not frame or frame:IsForbidden() or InCombatLockdown() then return end
-  if frame.unit == "player" or frame.displayedUnit == "player" then
-    if GroupSelfHideDB.hide then frame:Hide() else frame:Show() end
+  if frame.unit ~= "player" and frame.displayedUnit ~= "player" then return end
+  if Active() then
+    hiddenByUs[frame] = true
+    frame:Hide()
+  elseif hiddenByUs[frame] then
+    hiddenByUs[frame] = nil
+    frame:Show()
   end
 end
 
--- Show or hide the "Party" label with the own frame
+-- Hide the "Party" label with the own frame, restore it afterwards
 local function ApplyTitle()
   local title = CompactPartyFrame and CompactPartyFrame.title
-  if title then title:SetShown(not GroupSelfHideDB.hide) end
+  if not title then return end
+  if Active() then
+    titleHidden = true
+    title:Hide()
+  elseif titleHidden then
+    titleHidden = false
+    title:Show()
+  end
 end
 
 -- Fill mode: shrink own frame, widen the others so the group keeps its width
-local baseWidth, busy
 local function ApplySizes()
   if busy or InCombatLockdown() then return end
   local me, others = nil, {}
@@ -32,14 +50,16 @@ local function ApplySizes()
   if w > 2 then baseWidth = w end -- real width, not our shrunk one
   if not baseWidth then return end
   local n = GetNumGroupMembers()
-  local fill = GroupSelfHideDB.hide and GroupSelfHideDB.fill and n > 1 and n <= 5
+  local fill = Active() and GroupSelfHideDB.mode == "fill" and n > 1 and n <= 5
+  if not fill and not resized then return end
+  resized = fill
   busy = true -- SetWidth may re-trigger Blizzard updates
   me:SetWidth(fill and 1 or baseWidth)
   for _, f in ipairs(others) do f:SetWidth(fill and baseWidth * n / (n - 1) or baseWidth) end
   busy = false
 end
 
--- Walk all known compact frames
+-- Apply state to all known frames
 local function ApplyAll()
   ApplyTitle()
   ApplySizes()
@@ -48,9 +68,9 @@ local function ApplyAll()
   for i = 1, 40 do Apply(_G["CompactRaidFrame" .. i]) end
 end
 
--- Hide again whenever Blizzard refreshes a frame
+-- Re-apply whenever Blizzard refreshes a frame
 local function OnUpdate(frame)
-  if GroupSelfHideDB.hide then Apply(frame) ApplyTitle() ApplySizes() end
+  if Active() then Apply(frame) ApplyTitle() ApplySizes() end
 end
 hooksecurefunc("CompactUnitFrame_UpdateVisible", OnUpdate)
 hooksecurefunc("CompactUnitFrame_UpdateAll", OnUpdate)
@@ -63,34 +83,19 @@ ev:RegisterEvent("PLAYER_REGEN_ENABLED")
 ev:SetScript("OnEvent", function(_, event, name)
   if event == "ADDON_LOADED" then
     if name ~= "GroupSelfHide" then return end
-    GroupSelfHideDB = GroupSelfHideDB or { hide = true, fill = false }
-  elseif GroupSelfHideDB and GroupSelfHideDB.hide then
+    GroupSelfHideDB = GroupSelfHideDB or {}
+  else
     ApplyAll()
   end
 end)
 
--- Short usage text in the client language (German, else English)
-local function PrintHelp()
-  if GetLocale() == "deDE" then
-    print(PREFIX .. "/gsh - umschalten | hide - nur eigenen Frame ausblenden | fill - ausblenden und andere verbreitern")
-  else
-    print(PREFIX .. "/gsh - toggle | hide - only hide own frame | fill - hide and widen others")
-  end
-end
-
--- /gsh toggles, /gsh hide and /gsh fill set the mode, persisted via SavedVariables
+-- /gsh = fill mode, /gsh hide = hide mode; any command while a mode is on turns it off
 SLASH_GROUPSELFHIDE1 = "/gsh"
 SlashCmdList.GROUPSELFHIDE = function(msg)
-  msg = strlower(strtrim(msg or ""))
-  if msg == "help" then return PrintHelp() end
-  if msg == "hide" then
-    GroupSelfHideDB.hide, GroupSelfHideDB.fill = true, false
-  elseif msg == "fill" then
-    GroupSelfHideDB.hide, GroupSelfHideDB.fill = true, true
-  else
-    GroupSelfHideDB.hide = not GroupSelfHideDB.hide
-  end
+  local want = strlower(strtrim(msg or "")) == "hide" and "hide" or "fill"
+  GroupSelfHideDB.mode = (not GroupSelfHideDB.mode) and want or nil
   ApplyAll()
-  print(PREFIX .. (not GroupSelfHideDB.hide and "own frame shown"
-    or GroupSelfHideDB.fill and "own frame hidden, others widened (fill)" or "own frame hidden (hide)"))
+  local mode = GroupSelfHideDB.mode
+  print(PREFIX .. (mode == "fill" and "own frame hidden, others widened (fill)"
+    or mode == "hide" and "own frame hidden (hide)" or "own frame shown"))
 end
