@@ -2,6 +2,12 @@
 
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
+## [0.3.1] - 2026-11-07
+
+### Changed
+
+- README: add screenshots, simplify description
+
 ## [0.3.0] - 2026-11-07
 
 ### Added
