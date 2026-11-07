@@ -4,12 +4,13 @@ local PREFIX = "|cff33ff99GroupSelfHide|r "
 local hiddenByUs = {} -- frames we hid, to undo later
 local titleHidden, resized, baseWidth, busy
 
--- Only a horizontal party frame outside of raids is supported
+-- Only raid-style, horizontal party frames outside of raids are supported (Edit Mode settings)
 local function CanRun()
-  if IsInRaid() or not IsInGroup() then return false end
-  local a, b = CompactPartyFrameMember1, CompactPartyFrameMember2
-  local ta, tb = a and a:GetTop(), b and b:GetTop()
-  return ta ~= nil and tb ~= nil and math.abs(ta - tb) < 1 -- same row = horizontal
+  if IsInRaid() or not IsInGroup() or not EditModeManagerFrame then return false end
+  local party = Enum.EditModeUnitFrameSystemIndices.Party
+  local raidStyle = EditModeManagerFrame:GetSettingValueBool(
+    Enum.EditModeSystem.UnitFrame, party, Enum.EditModeUnitFrameSetting.UseRaidStylePartyFrames)
+  return raidStyle and EditModeManagerFrame:ShouldRaidFrameUseHorizontalRaidGroups(party)
 end
 
 -- Mode is nil (off), "hide" or "fill"; inactive in raids and vertical layouts
