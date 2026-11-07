@@ -2,7 +2,7 @@
 ## Title: GroupSelfHide
 ## Notes: Hides your own frame in raid-style group frames. Toggle with /gsh.
 ## Author: tf4482
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariables: GroupSelfHideDB
 
 GroupSelfHide.lua
