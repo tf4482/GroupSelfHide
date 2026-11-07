@@ -10,6 +10,10 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 - Calling a command while a mode is active switches back to normal
 - Default is off
 
+### Added
+
+- Addon stays inactive in raids and with a vertical party layout
+
 ### Removed
 
 - `/gsh fill` and `/gsh help`
