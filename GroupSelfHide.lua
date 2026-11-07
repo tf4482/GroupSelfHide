@@ -4,9 +4,17 @@ local PREFIX = "|cff33ff99GroupSelfHide|r "
 local hiddenByUs = {} -- frames we hid, to undo later
 local titleHidden, resized, baseWidth, busy
 
--- Mode is nil (off), "hide" or "fill"
+-- Only a horizontal party frame outside of raids is supported
+local function CanRun()
+  if IsInRaid() or not IsInGroup() then return false end
+  local a, b = CompactPartyFrameMember1, CompactPartyFrameMember2
+  local ta, tb = a and a:GetTop(), b and b:GetTop()
+  return ta ~= nil and tb ~= nil and math.abs(ta - tb) < 1 -- same row = horizontal
+end
+
+-- Mode is nil (off), "hide" or "fill"; inactive in raids and vertical layouts
 local function Active()
-  return GroupSelfHideDB and GroupSelfHideDB.mode ~= nil
+  return GroupSelfHideDB and GroupSelfHideDB.mode ~= nil and CanRun()
 end
 
 -- Hide or restore one compact frame (out of combat only, frames are protected)
@@ -80,6 +88,7 @@ local ev = CreateFrame("Frame")
 ev:RegisterEvent("ADDON_LOADED")
 ev:RegisterEvent("GROUP_ROSTER_UPDATE")
 ev:RegisterEvent("PLAYER_REGEN_ENABLED")
+ev:RegisterEvent("EDIT_MODE_LAYOUTS_UPDATED") -- layout may switch horizontal/vertical
 ev:SetScript("OnEvent", function(_, event, name)
   if event == "ADDON_LOADED" then
     if name ~= "GroupSelfHide" then return end
@@ -97,5 +106,6 @@ SlashCmdList.GROUPSELFHIDE = function(msg)
   ApplyAll()
   local mode = GroupSelfHideDB.mode
   print(PREFIX .. (mode == "fill" and "own frame hidden, others widened (fill)"
-    or mode == "hide" and "own frame hidden (hide)" or "own frame shown"))
+    or mode == "hide" and "own frame hidden (hide)" or "own frame shown")
+    .. ((mode and not CanRun()) and " - inactive in raids and vertical layouts" or ""))
 end
