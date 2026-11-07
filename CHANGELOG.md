@@ -8,6 +8,7 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [
 
 - Fill mode (`/gsh fill`) widens the other party frames to keep the group width
 - `/gsh hide` selects the plain hide mode
+- `/gsh help` prints a short usage text in the client language (German, otherwise English)
 
 ## [0.2.0] - 2026-11-07
 
