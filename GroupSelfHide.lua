@@ -69,10 +69,20 @@ ev:SetScript("OnEvent", function(_, event, name)
   end
 end)
 
+-- Short usage text in the client language (German, else English)
+local function PrintHelp()
+  if GetLocale() == "deDE" then
+    print(PREFIX .. "/gsh - umschalten | hide - nur eigenen Frame ausblenden | fill - ausblenden und andere verbreitern")
+  else
+    print(PREFIX .. "/gsh - toggle | hide - only hide own frame | fill - hide and widen others")
+  end
+end
+
 -- /gsh toggles, /gsh hide and /gsh fill set the mode, persisted via SavedVariables
 SLASH_GROUPSELFHIDE1 = "/gsh"
 SlashCmdList.GROUPSELFHIDE = function(msg)
   msg = strlower(strtrim(msg or ""))
+  if msg == "help" then return PrintHelp() end
   if msg == "hide" then
     GroupSelfHideDB.hide, GroupSelfHideDB.fill = true, false
   elseif msg == "fill" then

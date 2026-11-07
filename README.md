@@ -7,6 +7,7 @@ Tiny WoW addon (WoW Forever / Retail API) that hides **your own frame** in the r
 - Hides the player's own compact frame (party and raid style)
 - Hides the "Party" label above the party frames while hidden
 - Two modes: `hide` (frame hidden, gap stays) and `fill` (others widen to keep the group width)
+- `/gsh help` prints a short usage text in the client language (German, otherwise English)
 - Toggle with `/gsh`
 - State persists across sessions (`GroupSelfHideDB`)
 
@@ -20,6 +21,7 @@ Copy this folder to `World of Warcraft/<version>/Interface/AddOns/GroupSelfHide`
 /gsh        -> toggle: hide / show your own frame (default: hidden)
 /gsh hide   -> mode hide: only hide your own frame
 /gsh fill   -> mode fill: hide and widen the other frames
+/gsh help   -> short usage (German or English)
 ```
 
 Examples:
