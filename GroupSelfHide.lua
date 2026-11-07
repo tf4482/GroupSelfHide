@@ -10,8 +10,15 @@ local function Apply(frame)
   end
 end
 
+-- Show or hide the "Party" label with the own frame
+local function ApplyTitle()
+  local title = CompactPartyFrame and CompactPartyFrame.title
+  if title then title:SetShown(not GroupSelfHideDB.hide) end
+end
+
 -- Walk all known compact frames
 local function ApplyAll()
+  ApplyTitle()
   for i = 1, 5 do Apply(_G["CompactPartyFrameMember" .. i]) end
   for i = 1, 40 do Apply(_G["CompactRaidFrameMember" .. i]) end
   for i = 1, 40 do Apply(_G["CompactRaidFrame" .. i]) end
@@ -19,7 +26,7 @@ end
 
 -- Hide again whenever Blizzard refreshes a frame
 local function OnUpdate(frame)
-  if GroupSelfHideDB.hide then Apply(frame) end
+  if GroupSelfHideDB.hide then Apply(frame) ApplyTitle() end
 end
 hooksecurefunc("CompactUnitFrame_UpdateVisible", OnUpdate)
 hooksecurefunc("CompactUnitFrame_UpdateAll", OnUpdate)
