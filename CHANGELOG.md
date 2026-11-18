@@ -1,6 +1,20 @@
-# 📝 Changelog
+# Changelog
 
-All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
+All notable changes to this project are documented in this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
+[Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+### Added
+
+- Settings page (Esc > Options > AddOns) and addon compartment entry
+- `/gsh config` opens the settings page, `/gsh help` lists all commands
+
+### Changed
+
+- `/gsh` shows the current mode; `/gsh fill`, `/gsh hide`, and `/gsh off` set it
+- Release zips are built on GitHub and named `GroupSelfHide-vX.Y.Z.zip`
 
 ## [0.4.2] - 2026-11-18
 
