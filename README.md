@@ -38,4 +38,13 @@ Examples:
 
 ## License
 
-All rights reserved, see [LICENSE](LICENSE).
+Copyright (c) 2026 tf4482. All rights reserved, see [LICENSE](LICENSE).
+
+You may download this addon and use it for personal, non-commercial play in your own game client. Without prior written permission, you may not:
+
+- redistribute or re-upload it, in whole or in part, on any site or platform
+- modify it or publish modified versions or forks
+- bundle it into compilations, addon packs, or other projects
+- use it commercially
+
+For permissions, open an issue on GitHub.

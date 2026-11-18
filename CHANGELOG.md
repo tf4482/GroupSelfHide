@@ -2,6 +2,12 @@
 
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-11-18
+
+### Changed
+
+- README: detail license terms
+
 ## [0.4.1] - 2026-11-18
 
 ### Changed
