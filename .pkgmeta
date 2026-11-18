@@ -1,0 +1,11 @@
+# BigWigs packager settings
+package-as: GroupSelfHide
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - README.md
+  - CHANGELOG.md
+  - docs
