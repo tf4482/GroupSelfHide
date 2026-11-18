@@ -35,3 +35,7 @@ Examples:
 - `/gsh` closes the gap; the other four frames grow to the old total width.
 - `/gsh hide` only hides your frame.
 - Call either command again to show your frame.
+
+## License
+
+All rights reserved, see [LICENSE](LICENSE).
