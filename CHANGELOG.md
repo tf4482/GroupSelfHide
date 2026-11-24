@@ -10,11 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 
 - Settings page (Esc > Options > AddOns) and addon compartment entry
 - `/gsh config` opens the settings page, `/gsh help` lists all commands
+- "Per character" checkbox and `/gsh character on|off`: settings per character or per
+  account (saved in the new `GroupSelfHideCharDB`; the account mode stays as it was)
+- `/gsh test` applies the mode once now, `/gsh reset` restores the defaults,
+  `/gsh debug on|off` shows what the addon does
 
 ### Changed
 
 - `/gsh` shows the current mode; `/gsh fill`, `/gsh hide`, and `/gsh off` set it
 - Release zips are built on GitHub and named `GroupSelfHide-vX.Y.Z.zip`
+- WoW Forever only: the TOC no longer lists the Retail interface number
 
 ### Fixed
 
