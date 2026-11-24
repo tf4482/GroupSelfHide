@@ -33,7 +33,7 @@ end
 
 -- whether the feature should act now
 local function Active()
-  return ns.db ~= nil and ns.db.mode ~= "off" and Supported()
+  return ns.db ~= nil and ns.Get("mode") ~= "off" and Supported()
 end
 
 -- usable compact frame showing the player
@@ -116,7 +116,8 @@ local function Apply()
   Restore()
   if Active() then
     Hide()
-    if ns.db.mode == "fill" then
+    ns.Debug("apply: " .. ns.Get("mode"))
+    if ns.Get("mode") == "fill" then
       Fill()
     end
   end
@@ -140,12 +141,13 @@ end
 -- current mode, with hints when it does not take effect yet
 local function Status()
   local hint = ""
-  if ns.db.mode ~= "off" and not Supported() then
+  if ns.Get("mode") ~= "off" and not Supported() then
     hint = ns.Color("warning", " (inactive: party with raid-style, horizontal frames only)")
   elseif InCombatLockdown() then
     hint = ns.Color("warning", " (applies after combat)")
   end
-  ns.Print("mode: " .. ns.Color("value", Label(ns.db.mode)) .. hint)
+  ns.Print("mode: " .. ns.Color("value", Label(ns.Get("mode"))) .. hint)
+  ns.Status("per character", ns.OnOff(ns.char.perCharacter))
 end
 
 -- set the mode and report it
@@ -154,46 +156,65 @@ local function Switch(mode)
   Status()
 end
 
--- one refresh pending for the next frame, so hook bursts collapse into one Apply
-local pending = false
+-- switch per-character settings and report the new state
+local function PerCharacter(enabled)
+  ns.Set("perCharacter", enabled)
+  Status()
+end
+
+-- apply the active mode once now, for checking it in game
+local function Test()
+  ns.Debug("test: refresh")
+  Refresh()
+  Status()
+end
+
+-- one refresh pending, so hook bursts collapse into one Apply
+local pending
 
 -- run the pending refresh
 local function RunPending()
-  pending = false
+  pending = nil
   Refresh()
 end
 
 -- re-apply after Blizzard refreshes a party member frame; other compact frames are ignored
 local function OnFrameUpdate(frame)
-  if busy or pending or ns.db == nil or ns.db.mode == "off" or frame:IsForbidden() then
+  if busy or pending or ns.db == nil or ns.Get("mode") == "off" or frame:IsForbidden() then
     return
   end
   local name = frame:GetName()
   if name and name:find("^CompactPartyFrameMember") then
-    pending = true
-    C_Timer.After(0, RunPending)
+    pending = C_Timer.NewTimer(0.05, RunPending)
   end
 end
-hooksecurefunc("CompactUnitFrame_UpdateVisible", OnFrameUpdate)
-hooksecurefunc("CompactUnitFrame_UpdateAll", OnFrameUpdate)
+-- hook only functions this client has
+for _, name in ipairs({ "CompactUnitFrame_UpdateVisible", "CompactUnitFrame_UpdateAll" }) do
+  if type(_G[name]) == "function" then
+    hooksecurefunc(name, OnFrameUpdate)
+  end
+end
 
 -- event handlers by event name
 local events = {}
 
 -- roster changed: party, raid, or member count may differ
 function events.GROUP_ROSTER_UPDATE()
+  ns.Debug("GROUP_ROSTER_UPDATE fired")
   Refresh()
 end
 
 -- Edit Mode layout may switch raid-style or horizontal frames
 function events.EDIT_MODE_LAYOUTS_UPDATED()
+  ns.Debug("EDIT_MODE_LAYOUTS_UPDATED fired")
   Refresh()
 end
 
 -- one frame dispatching all events above
 local frame = CreateFrame("Frame")
 for event in pairs(events) do
-  frame:RegisterEvent(event)
+  -- skip events this client does not know
+  if C_EventUtils.IsEventValid(event) then frame:RegisterEvent(event) end
 end
 frame:SetScript("OnEvent", function(_, event, ...)
   events[event](...)
@@ -211,5 +232,30 @@ end)
 ns.Command({ name = "fill", help = "hide your frame and widen the others", run = function() Switch("fill") end })
 ns.Command({ name = "hide", help = "hide your frame, keep the gap", run = function() Switch("hide") end })
 ns.Command({ name = "off", help = "show your frame again", run = function() Switch("off") end })
+ns.Command({
+  name = "character",
+  help = "use settings for this character only, or the account's",
+  args = { { name = "state", choices = { "on", "off" } } },
+  run = function(args) PerCharacter(args.state == "on") end,
+})
+ns.Command({ name = "test", help = "apply the mode once now", run = Test })
+ns.Command({
+  name = "reset",
+  help = "reset the active profile's settings to defaults",
+  run = function()
+    ns.ResetSettings()
+    ns.Success("settings reset to defaults")
+    Status()
+  end,
+})
+ns.Command({
+  name = "debug",
+  help = "show what the addon does in chat, until /reload",
+  args = { { name = "state", choices = { "on", "off" } } },
+  run = function(args)
+    ns.debug = args.state == "on"
+    ns.Status("debug", ns.OnOff(ns.debug))
+  end,
+})
 ns.Command({ name = "config", help = "open the settings page", run = ns.OpenSettings })
 ns.Slash("/gsh", Status)

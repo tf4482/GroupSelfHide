@@ -1,10 +1,11 @@
-## Interface: 16001, 120105
+## Interface: 16001
 ## Title: GroupSelfHide
 ## Notes: Hides your own frame in raid-style party frames. Type /gsh for the mode.
 ## Author: tf4482
 ## Version: @project-version@
 ## IconTexture: Interface/Icons/Ability_Stealth
 ## SavedVariables: GroupSelfHideDB
+## SavedVariablesPerCharacter: GroupSelfHideCharDB
 
 Output.lua
 Store.lua
