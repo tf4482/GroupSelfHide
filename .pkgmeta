@@ -9,3 +9,6 @@ ignore:
   - README.md
   - CHANGELOG.md
   - docs
+  - icon
+  - VERSION
+  - deploy.bat
