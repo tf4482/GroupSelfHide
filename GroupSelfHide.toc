@@ -6,6 +6,7 @@
 ## IconTexture: Interface/Icons/Ability_Stealth
 ## SavedVariables: GroupSelfHideDB
 ## SavedVariablesPerCharacter: GroupSelfHideCharDB
+## X-Curse-Project-ID: 1789132
 
 Output.lua
 Store.lua
