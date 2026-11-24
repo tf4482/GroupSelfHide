@@ -3,7 +3,7 @@
 local _, ns = ...
 
 -- compact frame name prefixes and how many of each exist
-local FRAMES = { CompactPartyFrameMember = 5, CompactRaidFrameMember = 40, CompactRaidFrame = 40 }
+local FRAMES = { CompactPartyFrameMember = 5 }
 -- modes for the settings page and the status line
 local MODES = {
   { "off", "Off" },
@@ -154,10 +154,24 @@ local function Switch(mode)
   Status()
 end
 
--- re-apply after Blizzard refreshes a compact frame
+-- one refresh pending for the next frame, so hook bursts collapse into one Apply
+local pending = false
+
+-- run the pending refresh
+local function RunPending()
+  pending = false
+  Refresh()
+end
+
+-- re-apply after Blizzard refreshes a party member frame; other compact frames are ignored
 local function OnFrameUpdate(frame)
-  if not busy and ns.db ~= nil and ns.db.mode ~= "off" and not frame:IsForbidden() then
-    Refresh()
+  if busy or pending or ns.db == nil or ns.db.mode == "off" or frame:IsForbidden() then
+    return
+  end
+  local name = frame:GetName()
+  if name and name:find("^CompactPartyFrameMember") then
+    pending = true
+    C_Timer.After(0, RunPending)
   end
 end
 hooksecurefunc("CompactUnitFrame_UpdateVisible", OnFrameUpdate)

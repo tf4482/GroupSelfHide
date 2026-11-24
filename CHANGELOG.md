@@ -16,6 +16,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 - `/gsh` shows the current mode; `/gsh fill`, `/gsh hide`, and `/gsh off` set it
 - Release zips are built on GitHub and named `GroupSelfHide-vX.Y.Z.zip`
 
+### Fixed
+
+- Stutter and flicker from updates of unrelated compact frames such as raid frames and
+  nameplates; party frame updates in quick succession now apply once
+
 ## [0.4.2] - 2026-11-18
 
 ### Changed
