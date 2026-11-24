@@ -1,6 +1,12 @@
 -- Shared component: colored chat output; copied unchanged from wow-lua-house-style
+-- component version: 3 (2026-11)
 
 local ADDON, ns = ...
+
+-- localized fixed string from Locale.lua, else English
+local function T(text)
+  return ns.L and ns.L[text] or text
+end
 
 -- chat colors by meaning
 local COLORS = {
@@ -20,7 +26,7 @@ end
 
 -- colored on/off for a boolean state
 function ns.OnOff(enabled)
-  return enabled and ns.Color("success", "on") or ns.Color("muted", "off")
+  return enabled and ns.Color("success", T("on")) or ns.Color("muted", T("off"))
 end
 
 -- one chat line behind the colored addon name
@@ -51,4 +57,27 @@ end
 -- red error line
 function ns.Error(text)
   ns.Print(ns.Color("error", text))
+end
+
+-- debug lines on or off; never saved, so /reload turns them off
+ns.debug = false
+
+-- gray debug line, only while ns.debug is on
+function ns.Debug(text)
+  if ns.debug then
+    ns.Print(ns.Color("muted", T("debug") .. ": " .. tostring(text)))
+  end
+end
+
+-- last run time per throttle key
+local lastRun = {}
+
+-- whether `key` may fire now: at most once per `seconds`
+function ns.Throttle(key, seconds)
+  local now = GetTime()
+  if lastRun[key] and now - lastRun[key] < seconds then
+    return false
+  end
+  lastRun[key] = now
+  return true
 end

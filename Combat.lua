@@ -1,5 +1,6 @@
 -- Shared component: run protected work now or right after combat; copied unchanged from
 -- wow-lua-house-style
+-- component version: 1 (2026-11)
 
 local _, ns = ...
 

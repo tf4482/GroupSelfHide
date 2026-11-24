@@ -1,7 +1,13 @@
 -- Shared component: slash command with subcommands, arguments, options, and help;
 -- copied unchanged from wow-lua-house-style
+-- component version: 2 (2026-11)
 
 local ADDON, ns = ...
+
+-- localized fixed string from Locale.lua, else English
+local function T(text)
+  return ns.L and ns.L[text] or text
+end
 
 -- registered subcommands, in help order
 local commands = {}
@@ -54,8 +60,9 @@ local function Check(spec, word)
   if spec.type == "number" then
     local number = tonumber(word)
     if not number or (spec.min and number < spec.min) or (spec.max and number > spec.max) then
-      local range = spec.min and spec.max and " from " .. spec.min .. " to " .. spec.max or ""
-      return nil, spec.name .. " must be a number" .. range
+      local range = spec.min and spec.max
+        and " " .. T("from") .. " " .. spec.min .. " " .. T("to") .. " " .. spec.max or ""
+      return nil, spec.name .. " " .. T("must be a number") .. range
     end
     return number
   elseif spec.choices then
@@ -64,7 +71,7 @@ local function Check(spec, word)
         return choice
       end
     end
-    return nil, spec.name .. " must be one of " .. table.concat(spec.choices, ", ")
+    return nil, spec.name .. " " .. T("must be one of") .. " " .. table.concat(spec.choices, ", ")
   end
   return word
 end
@@ -77,14 +84,14 @@ local function Parse(command, words)
     if not name then
       positionals[#positionals + 1] = word
     elseif not FindOption(command, name) then
-      return nil, nil, "unknown option --" .. name
+      return nil, nil, T("unknown option") .. " --" .. name
     else
       options[name] = value ~= "" and value or true
     end
   end
   local specs = command.args or {}
   if #positionals > #specs then
-    return nil, nil, "too many arguments"
+    return nil, nil, T("too many arguments")
   end
   for index, spec in ipairs(specs) do
     local word = positionals[index]
@@ -95,7 +102,7 @@ local function Parse(command, words)
       end
       args[spec.name] = value
     elseif not spec.optional then
-      return nil, nil, "missing " .. spec.name
+      return nil, nil, T("missing") .. " " .. spec.name
     end
   end
   return args, options
@@ -103,14 +110,14 @@ end
 
 -- list all subcommands with their options
 local function Help()
-  ns.Print("commands:")
+  ns.Print(T("commands") .. ":")
   for _, command in ipairs(commands) do
     ns.Detail(ns.Color("command", Usage(command)) .. " - " .. command.help)
     for _, option in ipairs(command.options or {}) do
       ns.Detail("  " .. ns.Color("muted", "--" .. option.name .. " - " .. option.help))
     end
   end
-  ns.Detail(ns.Color("command", ns.slash .. " help") .. " - show this help")
+  ns.Detail(ns.Color("command", ns.slash .. " help") .. " - " .. T("show this help"))
 end
 
 -- register a subcommand: { name, help, args, options, run(args, options) }
@@ -144,11 +151,11 @@ function ns.Slash(slashes, status)
       if command.name == name then
         local args, options, problem = Parse(command, words)
         if not args then
-          return ns.Error(problem .. " - usage: " .. Usage(command))
+          return ns.Error(problem .. " - " .. T("usage") .. ": " .. Usage(command))
         end
         return command.run(args, options)
       end
     end
-    ns.Error("unknown command: " .. name .. " - see " .. ns.slash .. " help")
+    ns.Error(T("unknown command") .. ": " .. name .. " - " .. T("see") .. " " .. ns.slash .. " help")
   end
 end

@@ -1,9 +1,12 @@
 -- Shared component: saved addon state with defaults; copied unchanged from wow-lua-house-style
+-- component version: 2 (2026-11)
 
 local ADDON, ns = ...
 
 -- defaults per bound field, for reset and settings
 ns.defaults = {}
+-- stores to bind on load, in declaration order
+local stores = {}
 
 -- copy missing default keys into target, recursively
 local function Fill(target, defaults)
@@ -19,26 +22,38 @@ local function Fill(target, defaults)
   end
 end
 
--- bind the SavedVariables global `name` as ns[field] (default "db"); onLoad runs once loaded
+-- bind every store first, then run the onLoad callbacks, so each sees all stores
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("ADDON_LOADED")
+frame:SetScript("OnEvent", function(_, _, addon)
+  if addon ~= ADDON then
+    return
+  end
+  frame:UnregisterEvent("ADDON_LOADED")
+  for _, store in ipairs(stores) do
+    if type(_G[store.name]) ~= "table" then
+      _G[store.name] = {}
+    end
+    Fill(_G[store.name], ns.defaults[store.field])
+    ns[store.field] = _G[store.name]
+  end
+  for _, store in ipairs(stores) do
+    if store.onLoad then
+      store.onLoad(ns[store.field])
+    end
+  end
+end)
+
+-- bind the SavedVariables global `name` as ns[field] (default "db"); onLoad runs once loaded;
+-- a second call for the same field adds its defaults
 function ns.Store(name, defaults, onLoad, field)
   field = field or "db"
-  ns.defaults[field] = defaults
-  local frame = CreateFrame("Frame")
-  frame:RegisterEvent("ADDON_LOADED")
-  frame:SetScript("OnEvent", function(_, _, addon)
-    if addon ~= ADDON then
-      return
-    end
-    frame:UnregisterEvent("ADDON_LOADED")
-    if type(_G[name]) ~= "table" then
-      _G[name] = {}
-    end
-    Fill(_G[name], defaults)
-    ns[field] = _G[name]
-    if onLoad then
-      onLoad(ns[field])
-    end
-  end)
+  local known = ns.defaults[field] or {}
+  for key, value in pairs(defaults) do
+    known[key] = value
+  end
+  ns.defaults[field] = known
+  table.insert(stores, { name = name, field = field, onLoad = onLoad })
 end
 
 -- restore the defaults of ns[field] in place, so references stay valid
