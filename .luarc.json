@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime.version": "Lua 5.1",
+  "workspace.ignoreDir": ["Libs", ".release"],
+  "diagnostics.globals": [
+    "SlashCmdList",
+    "AddonCompartmentFrame",
+    "C_AddOns",
+    "C_EventUtils",
+    "C_KeyBindings",
+    "CreateFrame",
+    "CreateKeybindingEntryInitializer",
+    "CreateSettingsListSectionHeaderInitializer",
+    "GetLocale",
+    "GetTime",
+    "hooksecurefunc",
+    "InCombatLockdown",
+    "IsInGroup",
+    "IsInInstance",
+    "IsInRaid",
+    "MinimalSliderWithSteppersMixin",
+    "Settings",
+    "C_Timer",
+    "CompactPartyFrame",
+    "EditModeManagerFrame",
+    "Enum",
+    "GetNumGroupMembers"
+  ]
+}
