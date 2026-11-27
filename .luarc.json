@@ -20,6 +20,7 @@
     "IsInRaid",
     "MinimalSliderWithSteppersMixin",
     "Settings",
+    "SettingsDropdownControlMixin",
     "C_Timer",
     "CompactPartyFrame",
     "EditModeManagerFrame",
