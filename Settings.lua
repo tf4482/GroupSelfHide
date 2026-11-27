@@ -1,6 +1,6 @@
 -- Shared component: Blizzard settings page and addon compartment entry with account or
 -- per-character settings; copied unchanged from wow-lua-house-style
--- component version: 3 (2026-11)
+-- component version: 5 (2026-11)
 
 local ADDON, ns = ...
 
@@ -15,6 +15,26 @@ local category, layout
 local bound = {}
 -- default of each bound key, for reset
 local boundDefaults = {}
+-- dropdown width: Blizzard's with stepper arrows, and the house one without them
+local DEFAULT_DROPDOWN = 220
+local WIDE_DROPDOWN = 290
+-- settings rows whose dropdown this copy widened
+local widened = {}
+
+-- widen house dropdowns as rows are shown; recycled rows get Blizzard's width back,
+-- the stepper arrows Blizzard resets itself on every init
+if SettingsDropdownControlMixin then
+  hooksecurefunc(SettingsDropdownControlMixin, "Init", function(row, initializer)
+    local data = initializer and initializer.data
+    if data and data.houseWideDropdown then
+      row.Control.Dropdown:SetWidth(WIDE_DROPDOWN)
+      widened[row] = true
+    elseif widened[row] then
+      row.Control.Dropdown:SetWidth(DEFAULT_DROPDOWN)
+      widened[row] = nil
+    end
+  end)
+end
 
 -- per-character state: profile switch and the character's own setting values
 ns.Store(ADDON .. "CharDB", { perCharacter = false }, nil, "char")
@@ -97,7 +117,7 @@ end
 -- Store default; onChange(value) runs after each change and profile switch
 local function Bind(key, label, onChange)
   local charOnly = CharOnly(key)
-  local default = charOnly and ns.defaults.char[key] or ns.defaults.db[key]
+  local default = (charOnly and ns.defaults.char or ns.defaults.db)[key]
   local setting = Settings.RegisterProxySetting(category, ADDON .. "_" .. key, type(default),
     label, default,
     function() return ns.Get(key) end,
@@ -124,7 +144,7 @@ function ns.Slider(key, label, min, max, step, tooltip, onChange)
   Settings.CreateSlider(category, Bind(key, label, onChange), options, tooltip)
 end
 
--- dropdown for a key; choices is a list of { value, label }
+-- dropdown for a key, wide and without stepper arrows; choices is a list of { value, label }
 function ns.Dropdown(key, label, choices, tooltip, onChange)
   local function Options()
     local container = Settings.CreateControlTextContainer()
@@ -133,7 +153,12 @@ function ns.Dropdown(key, label, choices, tooltip, onChange)
     end
     return container:GetData()
   end
-  Settings.CreateDropdown(category, Bind(key, label, onChange), Options, tooltip)
+  local initializer = Settings.CreateDropdown(category, Bind(key, label, onChange), Options,
+    tooltip)
+  -- Blizzard reapplies the arrows on every value change; only this flag keeps them hidden
+  initializer.data.forceSteppersHidden = true
+  -- shared marker, so the hooks of all house addons agree on the width
+  initializer.data.houseWideDropdown = true
 end
 
 -- section header above the following controls
