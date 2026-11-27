@@ -1,6 +1,6 @@
 -- Shared component: Blizzard settings page and addon compartment entry with account or
 -- per-character settings; copied unchanged from wow-lua-house-style
--- component version: 4 (2026-11)
+-- component version: 5 (2026-11)
 
 local ADDON, ns = ...
 
@@ -117,7 +117,7 @@ end
 -- Store default; onChange(value) runs after each change and profile switch
 local function Bind(key, label, onChange)
   local charOnly = CharOnly(key)
-  local default = charOnly and ns.defaults.char[key] or ns.defaults.db[key]
+  local default = (charOnly and ns.defaults.char or ns.defaults.db)[key]
   local setting = Settings.RegisterProxySetting(category, ADDON .. "_" .. key, type(default),
     label, default,
     function() return ns.Get(key) end,
