@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+## [0.5.2] - 2026-11-27
+
+### Changed
+
+- Wider dropdowns on the settings page, without the arrows beside them
+
 ## [0.5.1] - 2026-11-24
 
 ### Added
